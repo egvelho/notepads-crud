@@ -1,15 +1,25 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 import { createNotepad } from "./notepad-crud";
 
 export function CreateNotepadForm() {
+  const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
   async function onSubmitNotepad(event) {
     event.preventDefault();
-    const mensagem = await createNotepad(title, description);
-    alert(mensagem);
+    const resultado = await createNotepad(title, description);
+    if (resultado.sucesso) {
+      toast.success(resultado.mensagem);
+      setTitle("");
+      setDescription("");
+      router.push("/");
+    } else {
+      toast.error(resultado.mensagem);
+    }
   }
 
   return (
