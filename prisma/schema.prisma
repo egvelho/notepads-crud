@@ -16,4 +16,13 @@ model Notepad {
   id            Int     @id @default(autoincrement()) 
   title         String
   description   String
-} 
+  userId        Int
+  user          User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id  Int @id @default(autoincrement())
+  username String @unique
+  password String
+  notepads Notepad[]
+}
