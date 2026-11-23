@@ -1,5 +1,6 @@
-import { getNotepadById } from "../../notepad-crud";
-import { EditNotepadForm } from "../../edit-notepad-form";
+import { getNotepadById } from "../../../notepad-crud";
+import { EditNotepadForm } from "../../../edit-notepad-form";
+import { Suspense } from "react";
 
 type PageProps = {
   params: {

@@ -1,25 +1,37 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { requireAuth } from "./require-auth";
 
-// Lista todas as anotações
+// Lista apenas as anotações do usuário logado
 export async function listNotepads() {
-  return prisma.notepad.findMany();
+  const { user } = await requireAuth();
+
+  return prisma.notepad.findMany({
+    where: {
+      userId: user.id,
+    },
+  });
 }
 
-// Devolve uma anotação pelo id
+// Devolve uma anotação pelo id SOMENTE se pertencer ao usuário logado
 export async function getNotepadById(id: number) {
+  const { user } = await requireAuth();
+
   const notepad = await prisma.notepad.findFirstOrThrow({
     where: {
       id,
+      userId: user.id,
     },
   });
 
   return notepad;
 }
 
-// Cria uma nova anotação
+// Cria uma nova anotação vinculada ao usuário logado
 export async function createNotepad(title: string, description: string) {
+  const { user } = await requireAuth();
+
   if (title.length < 4) {
     return {
       sucesso: false,
@@ -46,6 +58,7 @@ export async function createNotepad(title: string, description: string) {
     data: {
       title,
       description,
+      userId: user.id,
     },
   });
 
@@ -55,12 +68,14 @@ export async function createNotepad(title: string, description: string) {
   };
 }
 
-// Edita uma anotação pelo id
+// Edita uma anotação pelo id SOMENTE se pertencer ao usuário logado
 export async function editNotepad(
   id: number,
   title: string,
   description: string,
 ) {
+  const { user } = await requireAuth();
+
   if (title.length < 4) {
     return {
       sucesso: false,
@@ -83,10 +98,21 @@ export async function editNotepad(
     };
   }
 
-  await prisma.notepad.update({
+  const result = await prisma.notepad.updateMany({
     data: { title, description },
-    where: { id },
+    where: {
+      id,
+      userId: user.id,
+    },
   });
+
+  if (result.count === 0) {
+    return {
+      sucesso: false,
+      mensagem:
+        "Anotação não encontrada ou você não tem permissão para editá-la.",
+    };
+  }
 
   return {
     sucesso: true,
@@ -94,11 +120,24 @@ export async function editNotepad(
   };
 }
 
-// Deleta uma anotação pelo id
+// Deleta uma anotação pelo id SOMENTE se pertencer ao usuário logado
 export async function deleteNotepad(id: number) {
-  await prisma.notepad.delete({
-    where: { id },
+  const { user } = await requireAuth();
+
+  const result = await prisma.notepad.deleteMany({
+    where: {
+      id,
+      userId: user.id,
+    },
   });
+
+  if (result.count === 0) {
+    return {
+      sucesso: false,
+      mensagem:
+        "Anotação não encontrada ou você não tem permissão para deletá-la.",
+    };
+  }
 
   return {
     sucesso: true,

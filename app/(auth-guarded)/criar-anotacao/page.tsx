@@ -1,4 +1,4 @@
-import { CreateNotepadForm } from "../create-notepad-form";
+import { CreateNotepadForm } from "../../create-notepad-form";
 
 export default function CreateNotepad() {
   return (
