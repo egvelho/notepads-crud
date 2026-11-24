@@ -7,6 +7,8 @@ type PageProps = {
   };
 };
 
+export const instant = false;
+
 export default async function EditNotepadPage({ params }: PageProps) {
   const resolvedParams = await params;
   const notepadId = Number(resolvedParams.id);

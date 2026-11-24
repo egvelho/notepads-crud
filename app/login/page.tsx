@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { login } from "../auth";
 import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -14,6 +16,7 @@ export default function LoginPage() {
 
     if (response.success) {
       toast.success(response.message);
+      router.push("/");
     } else {
       toast.error(response.message);
     }

@@ -1,9 +1,12 @@
 import { NotepadsList } from "./notepads-list";
+import { AuthChecker } from "./auth-checker";
+
+export const instant = false;
 
 export default function Home() {
   return (
-    <div>
+    <AuthChecker>
       <NotepadsList />
-    </div>
+    </AuthChecker>
   );
 }

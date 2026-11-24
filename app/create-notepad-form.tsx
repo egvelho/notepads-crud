@@ -9,7 +9,7 @@ export function CreateNotepadForm() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
-  async function onSubmitNotepad(event) {
+  async function onSubmitNotepad(event: any) {
     event.preventDefault();
     const resultado = await createNotepad(title, description);
     if (resultado.sucesso) {

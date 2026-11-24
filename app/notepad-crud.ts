@@ -1,10 +1,23 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { getSession } from "./auth";
 
 // Lista todas as anotações
 export async function listNotepads() {
-  return prisma.notepad.findMany();
+  const session: any = await getSession();
+
+  if (session === null) {
+    return [];
+  }
+
+  const userId = session.user.userId;
+
+  return prisma.notepad.findMany({
+    where: {
+      userId,
+    },
+  });
 }
 
 // Devolve uma anotação pelo id
@@ -20,6 +33,17 @@ export async function getNotepadById(id: number) {
 
 // Cria uma nova anotação
 export async function createNotepad(title: string, description: string) {
+  const session: any = await getSession();
+
+  if (session === null) {
+    return {
+      success: false,
+      message: "Num pisa na mioca",
+    };
+  }
+
+  const userId = session.user.userId;
+
   if (title.length < 4) {
     return {
       sucesso: false,
@@ -46,6 +70,7 @@ export async function createNotepad(title: string, description: string) {
     data: {
       title,
       description,
+      userId,
     },
   });
 
@@ -61,6 +86,17 @@ export async function editNotepad(
   title: string,
   description: string,
 ) {
+  const session: any = await getSession();
+
+  if (session === null) {
+    return {
+      success: false,
+      message: "Num pisa na mioca",
+    };
+  }
+
+  const userId = session.user.userId;
+
   if (title.length < 4) {
     return {
       sucesso: false,
@@ -85,7 +121,7 @@ export async function editNotepad(
 
   await prisma.notepad.update({
     data: { title, description },
-    where: { id },
+    where: { id, userId },
   });
 
   return {
@@ -96,8 +132,19 @@ export async function editNotepad(
 
 // Deleta uma anotação pelo id
 export async function deleteNotepad(id: number) {
+  const session: any = await getSession();
+
+  if (session === null) {
+    return {
+      success: false,
+      message: "Num pisa na mioca",
+    };
+  }
+
+  const userId = session.user.userId;
+
   await prisma.notepad.delete({
-    where: { id },
+    where: { id, userId },
   });
 
   return {
